@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template
+import os
 import io
 import base64
 from PIL import Image
@@ -22,20 +23,15 @@ def upload_file():
         return "No selected file"
 
     if file:
-        # Convert image to bytes
         image_bytes = io.BytesIO(file.read())
-
-        # Open image using skimage and save it in "test.png"
         image = Image.open(image_bytes)
-        image.save('test.png')
-
-        # Encode image bytes to base64 for HTML display
+        image.save(os.path.join("uploads", file.filename))
         encoded_image = base64.b64encode(
             image_bytes.getvalue()).decode('utf-8')
-
-        return render_template('index.html', encoded_image=encoded_image, text="Image Uploaded!")
+        text = "Image Uploaded!\nImage Uploaded1!".split("\n")
+        return render_template('index.html', encoded_image=encoded_image, text=text)
     else:
-        return "Invalid file format. Allowed formats: png, jpg, jpeg, gif"
+        return "Invalid file format. Allowed formats: png, jpg, jpeg, gif, dicom"
 
 
 if __name__ == '__main__':
