@@ -4,7 +4,7 @@ from transformers import VisionEncoderDecoderModel, AutoTokenizer, ViTFeatureExt
 
 image_encoder_model = "google/vit-large-patch32-384"
 text_decode_model = "NlpHUST/gpt2-vietnamese"
-model_path = "checkpoint"
+model_path = "checkpoint/checkpoint-7700"
 
 
 def build_inputs_with_special_tokens(self, token_ids_0, token_ids_1=None):
@@ -23,7 +23,11 @@ tokenizer.pad_token = tokenizer.unk_token
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = VisionEncoderDecoderModel.from_pretrained(model_path)
-img = Image.open(image_paths).convert("RGB")
-caption = tokenizer.decode(model.generate(feature_extractor(
-    img, return_tensors="pt").pixel_values.to(device))[0], skip_special_tokens=True)
-caption[:caption.find("\n\n")] if caption.find("\n\n") != -1 else caption
+
+
+def generate_caption(image_paths):
+    img = Image.open(image_paths).convert("RGB")
+    caption = tokenizer.decode(model.generate(feature_extractor(
+        img, return_tensors="pt").pixel_values.to(device))[0], skip_special_tokens=True)
+    caption[:caption.find("\n\n")] if caption.find("\n\n") != -1 else caption
+    return caption

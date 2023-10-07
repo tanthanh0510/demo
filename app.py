@@ -3,6 +3,7 @@ import os
 import io
 import base64
 from PIL import Image
+from model import generate_caption
 
 app = Flask(__name__)
 
@@ -28,7 +29,7 @@ def upload_file():
         image.save(os.path.join("uploads", file.filename))
         encoded_image = base64.b64encode(
             image_bytes.getvalue()).decode('utf-8')
-        text = "Image Uploaded!\nImage Uploaded1!".split("\n")
+        text = generate_caption(os.path.join("uploads", file.filename))
         return render_template('index.html', encoded_image=encoded_image, text=text)
     else:
         return "Invalid file format. Allowed formats: png, jpg, jpeg, gif, dicom"
