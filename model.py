@@ -23,11 +23,11 @@ tokenizer.pad_token = tokenizer.unk_token
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = VisionEncoderDecoderModel.from_pretrained(model_path)
-
+model = model.to(device)
 
 def generate_caption(image_paths):
     img = Image.open(image_paths).convert("RGB")
     caption = tokenizer.decode(model.generate(feature_extractor(
         img, return_tensors="pt").pixel_values.to(device))[0], skip_special_tokens=True)
-    caption[:caption.find("\n\n")] if caption.find("\n\n") != -1 else caption
+    caption = caption[:caption.find("\n\n")] if caption.find("\n\n") != -1 else caption
     return caption

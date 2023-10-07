@@ -29,19 +29,21 @@ def upload_file():
     if file:
         # check if file is dicom, convert to png
         if file.filename.endswith(".dcm"):
-            ds = pydicom.dcmread(file)
+            #write file to uploads folder and convert to png
+            file.save(os.path.join("uploads", file.filename))
+            ds = pydicom.dcmread(os.path.join("uploads", file.filename))
             t = (ds.pixel_array - np.min(ds.pixel_array))/(np.max(ds.pixel_array) - np.min(ds.pixel_array))
             cv2.imwrite(os.path.join("uploads", file.filename.replace(".dcm",".png")),t*255)
-            encoded_image = base64.b64encode(
-                t*255).decode('utf-8')
+            image_bytes = io.BytesIO(open(os.path.join("uploads", file.filename.replace(".dcm",".png")), 'rb').read())
+            imageName = os.path.join("uploads", file.filename.replace(".dcm",".png"))
         else:  
             image_bytes = io.BytesIO(file.read())
             image = Image.open(image_bytes)
             image.save(os.path.join("uploads", file.filename))
-            encoded_image = base64.b64encode(
+            imageName = os.path.join("uploads", file.filename.replace(".dcm",".png"))
+        encoded_image = base64.b64encode(
                 image_bytes.getvalue()).decode('utf-8')
-        
-        text = generate_caption(os.path.join("uploads", file.filename))
+        text = generate_caption(imageName).split("\n")
         return render_template('index.html', encoded_image=encoded_image, text=text)
     else:
         return "Invalid file format. Allowed formats: png, jpg, jpeg, gif, dicom"
