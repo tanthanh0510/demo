@@ -18,15 +18,36 @@
         width: 100%;
         text-align: center;
       }
-      #image {
+
+      .container {
+        width: 100%;
+        display: flex;
+        padding: 10px 10%;
+      }
+      #imageContainer {
         width: 100%;
         display: flex;
         justify-content: space-between;
         padding: 0 15%;
       }
       img {
-        width: 50vw;
+        width: 30vw;
         max-height: 800px;
+      }
+
+      #captions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .caption {
+        height: max-content;
+        border: 1px solid orange;
+        border-radius: 8px;
+      }
+
+      p {
+        border-bottom: 1px solid orange;
       }
     </style>
   </head>
@@ -39,32 +60,80 @@
         enctype="multipart/form-data"
       >
         <input
+          id="input"
           type="file"
           name="file"
           accept=".png, .jpg, .jpeg, .gif, .dicom"
-          onchange="submitForm()"
         />
       </form>
 
-      {% if encoded_image %}
-      <div id="image">
-        <img
-          src="data:image/png;base64,{{ encoded_image }}"
-          alt="Uploaded Image"
-        />
-        {% if text %}
-        <p>
-          {% for line in text %} {{ line }} <br />
-          {% endfor %}
-        </p>
-        {% endif %}
+      <div class="container">
+        <div id="imageContainer">
+          <img id="image" alt="Uploaded Image" />
+        </div>
+        <div id="captions"></div>
       </div>
-      {% endif %}
     </div>
     <script>
-      function submitForm() {
-        document.querySelector(".form").submit();
-      }
+      const result = {};
+      const fileInput = document.getElementById("input");
+      const img = document.getElementById("image");
+      const captions = document.getElementById("captions");
+      console.log("img", img);
+
+      const uploadFile = (file) => {
+        console.log("Uploading file...");
+        const API_ENDPOINT = "/upload";
+        const request = new XMLHttpRequest();
+        const formData = new FormData();
+
+        request.open("POST", API_ENDPOINT, true);
+        request.onreadystatechange = () => {
+          if (request.readyState === 4 && request.status === 200) {
+            // console.log(request.responseText);
+            const result = JSON.parse(request.response);
+            // console.log("request.response", request.response);
+            console.log("result", result);
+            if (result.image) {
+              img.src = "data:image/png;base64," + result.image;
+            }
+
+            // render result.captions into captions element
+            if (result.captions) {
+              const captions = document.getElementById("captions");
+              captions.innerHTML = "";
+              result.captions.forEach((caption) => {
+                const captionElement = document.createElement("div");
+                captionElement.classList.add("caption");
+
+                const p = document.createElement("p");
+                p.innerHTML = caption.Finding;
+                const p2 = document.createElement("p");
+                p2.innerHTML = caption.Impression;
+                const p3 = document.createElement("p");
+
+                p3.innerHTML = caption.p;
+                captionElement.appendChild(p);
+                captionElement.appendChild(p2);
+                captionElement.appendChild(p3);
+                captions.appendChild(captionElement);
+              });
+            }
+          }
+        };
+        formData.append("file", file);
+        request.send(formData);
+      };
+
+      fileInput.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        uploadFile(file);
+        // const reader = new FileReader();
+        // reader.onload = function (event) {
+        //   const img = document.querySelector("img");
+        //   img.src = event.target.result;
+        // };
+      });
     </script>
   </body>
 </html>
