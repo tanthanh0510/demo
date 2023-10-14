@@ -18,11 +18,25 @@
         width: 100%;
         text-align: center;
       }
-
+      .header {
+        width: 100%;
+        display: flex;
+        padding: 10px 0 0 1%;
+        gap: 10%;
+      }
       .container {
         width: 100%;
         display: flex;
         padding: 10px 1%;
+      }
+      #logo175 {
+        margin-left: 24%;
+        width: 20%;
+        /* max-height: 100px; */
+      }
+      #logoiuh {
+        width: 20%;
+        /* max-height: 100px; */
       }
       #imageContainer {
         width: 100%;
@@ -69,6 +83,19 @@
     </style>
   </head>
   <body>
+    <div class="header">
+      <img
+        id="logo175"
+        src="{{ url_for('static', filename='logo.jpg') }}"
+        alt="Information Technology Unit 175 Hospital"
+      />
+      <img
+        id="logoiuh"
+        src="{{ url_for('static', filename='iuh.jpg') }}"
+        alt="Industrial University of Ho Chi Minh City"
+      />
+    </div>
+
     <div id="main">
       <form
         class="form"
