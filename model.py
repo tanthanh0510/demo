@@ -36,7 +36,7 @@ def generate_caption(image_paths):
     for i in range(5):
         captions.append(
         {
-        "Finding": "\n".join(sequences[i].strip().split("\n")[:-1]),
+        "Finding": "<br>".join(sequences[i].strip().split("\n")[:-1]),
         "Impression": sequences[i].strip().split("\n")[-1],
         'p': str(p[i])
         }
