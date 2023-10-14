@@ -49,26 +49,10 @@ def upload_file():
                 "uploads", file.filename.replace(".dcm", ".png"))
         encoded_image = base64.b64encode(
             image_bytes.getvalue()).decode('utf-8')
-        # text = generate_caption(os.path.join("uploads", file.filename))
-        finding = "Finding"
-        impress = "Impression"
+        captions = generate_caption(imageName)
         tmp = {"image": encoded_image,
-               "captions":
-               [{
-                   "Finding": "Finding",
-                "Impression": "Impression",
-                "p": 0.78,
-                }, {
-                   "Finding": "Finding",
-                   "Impression": "Impression",
-                   "p": 0.8,
-               }]}
-        # text = ["123", "456", "789"]
+               "captions":captions}
         return jsonify(tmp)
-    #     return render_template('index.html', encoded_image=encoded_image, text=text)
-    # else:
-    #     return "Invalid file format. Allowed formats: png, jpg, jpeg, gif, dicom"
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

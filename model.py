@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from PIL import Image
 from transformers import VisionEncoderDecoderModel, AutoTokenizer, ViTFeatureExtractor
 
@@ -27,7 +28,17 @@ model = model.to(device)
 
 def generate_caption(image_paths):
     img = Image.open(image_paths).convert("RGB")
-    caption = tokenizer.decode(model.generate(feature_extractor(
-        img, return_tensors="pt").pixel_values.to(device))[0], skip_special_tokens=True)
-    caption = caption[:caption.find("\n\n")] if caption.find("\n\n") != -1 else caption
-    return caption
+    imageFeature = feature_extractor(img, return_tensors="pt").pixel_values.to(device)
+    output_ids = model.generate(imageFeature, max_length=128, num_beams=5, num_return_sequences=5, return_dict_in_generate=True,output_scores=True, eos_token_id=50257)
+    sequences = tokenizer.batch_decode(output_ids['sequences'], skip_special_tokens=True)
+    p = torch.exp(output_ids['sequences_scores'])
+    captions = []
+    for i in range(5):
+        captions.append(
+        {
+        "Finding": "\n".join(sequences[i].split("\n")[:-1]),
+        "Impression": sequences[i].split("\n")[-1],
+        'p': p[i]
+        }
+        )
+    return captions
