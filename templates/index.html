@@ -22,32 +22,49 @@
       .container {
         width: 100%;
         display: flex;
-        padding: 10px 10%;
+        padding: 10px 1%;
       }
       #imageContainer {
         width: 100%;
         display: flex;
         justify-content: space-between;
-        padding: 0 15%;
+        padding: 0 5%;
       }
       img {
-        width: 30vw;
+        width: 100%;
         max-height: 800px;
       }
 
       #captions {
         display: flex;
         gap: 10px;
+        width: 100%;
       }
 
       .caption {
         height: max-content;
         border: 1px solid orange;
         border-radius: 8px;
+        padding: 10px;
       }
 
-      p {
-        border-bottom: 1px solid orange;
+      table {
+        /* border-collapse: collapse; */
+        width: 100%;
+        border: 1px solid orange;
+        border-radius: 8px;
+        margin-left: 10px;
+      }
+      td {
+        border: 1px solid orange;
+        padding: 10px;
+      }
+      th {
+        border: 1px solid orange;
+        padding: 10px;
+      }
+      tr:nth-child(even) {
+        background-color: #dddddd;
       }
     </style>
   </head>
@@ -101,23 +118,65 @@
             // render result.captions into captions element
             if (result.captions) {
               const captions = document.getElementById("captions");
-              captions.innerHTML = "";
+              // create a table with 3 columns "Mô tả", "Kết luận", "Xác suất"
+              const table = document.createElement("table");
+              const thead = document.createElement("thead");
+              const tbody = document.createElement("tbody");
+              const tr = document.createElement("tr");
+              const th1 = document.createElement("th");
+              const th2 = document.createElement("th");
+              const th3 = document.createElement("th");
+              th1.innerHTML = "Mô tả";
+              th2.innerHTML = "Kết luận";
+              th3.innerHTML = "Xác suất";
+              tr.appendChild(th1);
+              tr.appendChild(th2);
+              tr.appendChild(th3);
+              thead.appendChild(tr);
+              table.appendChild(thead);
+              table.appendChild(tbody);
               result.captions.forEach((caption) => {
-                const captionElement = document.createElement("div");
-                captionElement.classList.add("caption");
-
-                const p = document.createElement("p");
-                p.innerHTML = caption.Finding;
-                const p2 = document.createElement("p");
-                p2.innerHTML = caption.Impression;
-                const p3 = document.createElement("p");
-
-                p3.innerHTML = caption.p;
-                captionElement.appendChild(p);
-                captionElement.appendChild(p2);
-                captionElement.appendChild(p3);
-                captions.appendChild(captionElement);
+                const tr = document.createElement("tr");
+                const td1 = document.createElement("td");
+                const td2 = document.createElement("td");
+                const td3 = document.createElement("td");
+                td1.innerHTML = caption.Finding;
+                td2.innerHTML = caption.Impression;
+                td3.innerHTML = caption.p;
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                tr.appendChild(td3);
+                tbody.appendChild(tr);
               });
+              captions.appendChild(table);
+              // captions.innerHTML = "";
+              // result.captions.forEach((caption) => {
+              //   const captionElement = document.createElement("div");
+              //   captionElement.classList.add("caption");
+              //   const findingElement = document.createElement("div");
+              //   findingElement.classList.add("finding");
+              //   const p = document.createElement("p");
+              //   p.innerHTML = caption.Finding;
+              //   findingElement.appendChild(p);
+
+              //   const impressionElement = document.createElement("div");
+              //   impressionElement.classList.add("impression");
+              //   const p2 = document.createElement("p");
+              //   p2.innerHTML = caption.Impression;
+              //   impressionElement.appendChild(p2);
+
+              //   const probabilityElement = document.createElement("div");
+              //   probabilityElement.classList.add("probability");
+              //   const p3 = document.createElement("p");
+              //   p3.innerHTML = caption.p;
+              //   probabilityElement.appendChild(p3);
+
+              //   captionElement.appendChild(findingElement);
+              //   captionElement.appendChild(impressionElement);
+              //   captionElement.appendChild(probabilityElement);
+
+              //   captions.appendChild(captionElement);
+              // });
             }
           }
         };
