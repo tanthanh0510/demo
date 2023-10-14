@@ -31,7 +31,7 @@ def generate_caption(image_paths):
     imageFeature = feature_extractor(img, return_tensors="pt").pixel_values.to(device)
     output_ids = model.generate(imageFeature, max_length=128, num_beams=5, num_return_sequences=5, return_dict_in_generate=True,output_scores=True, eos_token_id=50257)
     sequences = tokenizer.batch_decode(output_ids['sequences'], skip_special_tokens=True)
-    p = torch.exp(output_ids['sequences_scores'])
+    p = torch.exp(output_ids['sequences_scores']).cpu().detach().numpy()
     captions = []
     for i in range(5):
         captions.append(
