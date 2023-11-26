@@ -23,6 +23,7 @@ tokenizer.pad_token = tokenizer.unk_token
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("device: ", device)
 model = VisionEncoderDecoderModel.from_pretrained(model_path)
 model = model.to(device)
 

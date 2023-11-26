@@ -1,9 +1,9 @@
+import time
 from flask import Flask, request, render_template, jsonify
 import os
 import io
 import base64
 from PIL import Image
-# from model import generate_caption
 import numpy as np
 import pydicom
 import cv2
@@ -49,10 +49,11 @@ def upload_file():
                 "uploads", file.filename.replace(".dcm", ".png"))
         encoded_image = base64.b64encode(
             image_bytes.getvalue()).decode('utf-8')
+        start_time = time.time()
         captions = generate_caption(imageName)
+        end_time = time.time()
+        print("Time taken: {}".format(end_time - start_time))
         tmp = {"image": encoded_image,
                "captions":captions}
         return jsonify(tmp)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
