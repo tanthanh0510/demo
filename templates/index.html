@@ -40,7 +40,7 @@
       }
       #imageContainer {
         width: 100%;
-        display: flex;
+        display: block;
         justify-content: space-between;
         padding: 0 5%;
       }
@@ -114,6 +114,7 @@
       <div class="container">
         <div id="imageContainer">
           <img id="image" alt="Uploaded Image" />
+          <img id="segment" alt="Uploaded Image" />
         </div>
         <div id="captions"></div>
       </div>
@@ -122,6 +123,7 @@
       const result = {};
       const fileInput = document.getElementById("input");
       const img = document.getElementById("image");
+      const segment = document.getElementById("segment");
       const captions = document.getElementById("captions");
       console.log("img", img);
 
@@ -134,18 +136,15 @@
         request.open("POST", API_ENDPOINT, true);
         request.onreadystatechange = () => {
           if (request.readyState === 4 && request.status === 200) {
-            // console.log(request.responseText);
             const result = JSON.parse(request.response);
-            // console.log("request.response", request.response);
-            console.log("result", result);
             if (result.image) {
               img.src = "data:image/png;base64," + result.image;
             }
-
-            // render result.captions into captions element
+            if (result.segmented_image) {
+              segment.src = "data:image/png;base64," + result.segmented_image;
+            }
             if (result.captions) {
               const captions = document.getElementById("captions");
-              // create a table with 3 columns "Mô tả", "Kết luận", "Xác suất"
               const table = document.createElement("table");
               const thead = document.createElement("thead");
               const tbody = document.createElement("tbody");
@@ -176,34 +175,6 @@
                 tbody.appendChild(tr);
               });
               captions.appendChild(table);
-              // captions.innerHTML = "";
-              // result.captions.forEach((caption) => {
-              //   const captionElement = document.createElement("div");
-              //   captionElement.classList.add("caption");
-              //   const findingElement = document.createElement("div");
-              //   findingElement.classList.add("finding");
-              //   const p = document.createElement("p");
-              //   p.innerHTML = caption.Finding;
-              //   findingElement.appendChild(p);
-
-              //   const impressionElement = document.createElement("div");
-              //   impressionElement.classList.add("impression");
-              //   const p2 = document.createElement("p");
-              //   p2.innerHTML = caption.Impression;
-              //   impressionElement.appendChild(p2);
-
-              //   const probabilityElement = document.createElement("div");
-              //   probabilityElement.classList.add("probability");
-              //   const p3 = document.createElement("p");
-              //   p3.innerHTML = caption.p;
-              //   probabilityElement.appendChild(p3);
-
-              //   captionElement.appendChild(findingElement);
-              //   captionElement.appendChild(impressionElement);
-              //   captionElement.appendChild(probabilityElement);
-
-              //   captions.appendChild(captionElement);
-              // });
             }
           }
         };

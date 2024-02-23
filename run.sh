@@ -1,0 +1,1 @@
+gunicorn --bind :8080 --workers 2 --threads 8 --timeout 0 app:app

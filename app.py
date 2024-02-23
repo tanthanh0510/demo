@@ -7,7 +7,7 @@ from PIL import Image
 import numpy as np
 import pydicom
 import cv2
-from model import generate_caption
+from model import generate_caption, segment
 
 app = Flask(__name__)
 
@@ -29,6 +29,9 @@ def upload_file():
 
     if file:
         # check if file is dicom, convert to png
+        assert file.filename.endswith(".dcm") or file.filename.endswith(
+            ".png") or file.filename.endswith(".jpg") or file.filename.endswith(".jpeg"), "File must be in .dcm, .png, .jpg, .jpeg format"
+        
         if file.filename.endswith(".dcm"):
             # write file to uploads folder and convert to png
             file.save(os.path.join("uploads", file.filename))
@@ -51,9 +54,16 @@ def upload_file():
             image_bytes.getvalue()).decode('utf-8')
         start_time = time.time()
         captions = generate_caption(imageName)
+        segmented_image = segment(imageName)
+        segmented_image_name = os.path.join(
+            "uploads", file.filename.replace(".dcm", "_segmented.png"))
+        segmented_image.save(segmented_image_name)
+        encoded_seg = base64.b64encode(
+            open(segmented_image_name, 'rb').read()).decode('utf-8')
         end_time = time.time()
         print("Time taken: {}".format(end_time - start_time))
         tmp = {"image": encoded_image,
+                "segmented_image": encoded_seg,
                "captions":captions}
         return jsonify(tmp)
 
