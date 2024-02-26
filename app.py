@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 from flask import Flask, request, render_template, jsonify
 import os
 import io
@@ -9,7 +10,15 @@ import pydicom
 import cv2
 from model import generate_caption, segment
 from documents import default
+from utils import uploadFile
+
 app = Flask(__name__)
+
+if not os.path.exists("Uploads"):
+    os.makedirs("Uploads/Images")
+    os.makedirs("Uploads/Segment")
+    os.makedirs("Uploads/Dataset/files")
+    os.makedirs("Uploads/Dataset/captions")
 
 app.register_blueprint(default)
 
@@ -35,36 +44,60 @@ def upload_file():
         
         if file.filename.endswith(".dcm"):
             # write file to uploads folder and convert to png
-            file.save(os.path.join("uploads", file.filename))
-            ds = pydicom.dcmread(os.path.join("uploads", file.filename))
+            file.save(os.path.join("Uploads/Images", file.filename))
+            ds = pydicom.dcmread(os.path.join("Uploads", file.filename))
             t = (ds.pixel_array - np.min(ds.pixel_array)) / \
-                (np.max(ds.pixel_array) - np.min(ds.pixel_array))
-            cv2.imwrite(os.path.join(
-                "uploads", file.filename.replace(".dcm", ".png")), t*255)
-            image_bytes = io.BytesIO(open(os.path.join(
-                "uploads", file.filename.replace(".dcm", ".png")), 'rb').read())
+                (np.max(ds.pixel_array) - np.min(ds.pixel_array))            
             imageName = os.path.join(
-                "uploads", file.filename.replace(".dcm", ".png"))
+                "Uploads/Images", file.filename.replace(".dcm", ".png"))
+            cv2.imwrite(imageName, t*255)
         else:
             image_bytes = io.BytesIO(file.read())
             image = Image.open(image_bytes)
-            image.save(os.path.join("uploads", file.filename))
             imageName = os.path.join(
-                "uploads", file.filename.replace(".dcm", ".png"))
-        encoded_image = base64.b64encode(
-            image_bytes.getvalue()).decode('utf-8')
+                "Uploads/Images", file.filename)
+            image.save(imageName)
         start_time = time.time()
         captions = generate_caption(imageName)
         segmented_image = segment(imageName)
-        segmented_image_name = os.path.join(
-            "uploads", file.filename.replace(".dcm", "_segmented.png"))
+        image_url = uploadFile(imageName)
+        segmented_image_name = imageName.replace("Images", "Segment")
         segmented_image.save(segmented_image_name)
-        encoded_seg = base64.b64encode(
-            open(segmented_image_name, 'rb').read()).decode('utf-8')
+        image_seg_url = uploadFile(segmented_image_name)
         end_time = time.time()
+        # remove imageName and segmented_image_name
+        os.remove(imageName)
+        os.remove(segmented_image_name)
         print("Time taken: {}".format(end_time - start_time))
-        tmp = {"image": encoded_image,
-                "segmented_image": encoded_seg,
+        tmp = {"image": image_url,
+                "segmented_image": image_seg_url,
                "captions":captions}
         return jsonify(tmp)
 
+
+@app.route('/update', methods=['POST'])
+def update_caption():
+    if 'file' not in request.files:
+        return "No file part"
+
+    file = request.files['file']
+    caption = request.form['caption']
+    if file.filename == '':
+        return "No selected file"
+
+    if caption == '':
+        return "No caption provided"
+    # create name is current time + file name
+    file_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S") +"-"+ file.filename
+    file_name_path = os.path.join("Uploads/Dataset/files", file_name)
+    caption_file = os.path.join("Uploads/Dataset/captions", file_name.replace(".png", ".txt"))
+    file.save(file_name_path)
+    with open(caption_file, "w") as f:
+        f.write(caption)
+
+    if os.path.exists(file_name_path) and os.path.exists(caption_file):
+        os.remove(file_name_path)
+        os.remove(caption_file)
+        return "Upload successful"
+    
+    return "Upload failed"
