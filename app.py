@@ -104,7 +104,7 @@ def update_caption():
         with open(caption_file, "w") as f:
             f.write(caption)
 
-        if os.path.exists(file_name_path) and os.path.exists(caption_file):
+        if uploadFile(file_name_path) and uploadFile(caption_file):
             os.remove(file_name_path)
             os.remove(caption_file)
             return jsonify({"code": 1, "message": "Upload successful"})
