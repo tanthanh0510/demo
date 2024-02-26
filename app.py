@@ -8,9 +8,10 @@ import numpy as np
 import pydicom
 import cv2
 from model import generate_caption, segment
-
+from documents import default
 app = Flask(__name__)
 
+app.register_blueprint(default)
 
 @app.route('/')
 def index():
