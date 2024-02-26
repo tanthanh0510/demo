@@ -45,7 +45,7 @@ def upload_file():
             if file.filename.endswith(".dcm"):
                 # write file to uploads folder and convert to png
                 file.save(os.path.join("Uploads/Images", file.filename))
-                ds = pydicom.dcmread(os.path.join("Uploads", file.filename))
+                ds = pydicom.dcmread(os.path.join("Uploads/Images", file.filename))
                 t = (ds.pixel_array - np.min(ds.pixel_array)) / \
                     (np.max(ds.pixel_array) - np.min(ds.pixel_array))            
                 imageName = os.path.join(
