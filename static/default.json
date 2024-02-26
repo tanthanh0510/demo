@@ -35,43 +35,109 @@
             "schema": {
               "type": "object",
               "properties": {
-                "image": {
-                  "type": "string",
-                  "format": "byte",
-                  "description": "Base64 encoded image file"
+                "code": {
+                  "type": "number",
+                  "description": "1 for success, 0 for failure"
                 },
-                "segmented_image": {
-                  "type": "string",
-                  "format": "byte",
-                  "description": "Base64 encoded segmented image file"
-                },
-                "captions": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "Finding": {
-                        "type": "string",
-                        "description": "Description 'finding' of the image"
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "image": {
+                      "type": "string",
+                      "description": "Url for the uploaded image"
+                    },
+                    "segmented_image": {
+                      "type": "string",
+                      "description": "Url for the segmented image"
+                    },
+                    "captions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "Finding": {
+                            "type": "string",
+                            "description": "Description 'finding' of the image"
+                          },
+                          "Impression": {
+                            "type": "string",
+                            "description": "Description 'impression' of the image"
+                          },
+                          "p": {
+                            "type": "number",
+                            "format": "float",
+                            "description": "Confidence score"
+                          }
+                        }
                       },
-                      "Impression": {
-                        "type": "string",
-                        "description": "Description 'impression' of the image"
-                      },
-                      "p": {
-                        "type": "number",
-                        "format": "float",
-                        "description": "Confidence score"
-                      }
+                      "description": "Generated captions for the image"
                     }
-                  },
-                  "description": "Generated captions for the image"
+                  }
                 }
               }
             }
           },
           "400": {
             "description": "Invalid file format or other error"
+          }
+        }
+      }
+    },
+    "/update": {
+      "post": {
+        "summary": "Update caption and upload file",
+        "consumes": ["multipart/form-data"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "file",
+            "type": "file",
+            "required": true,
+            "description": "The file to upload"
+          },
+          {
+            "in": "formData",
+            "name": "caption",
+            "type": "string",
+            "required": true,
+            "description": "The caption to associate with the file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Response code. 1 for success, 0 for failure."
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Description of the operation result"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error occurred during file upload or processing",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Response code. Always 0 for failure."
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
           }
         }
       }

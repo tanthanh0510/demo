@@ -137,11 +137,12 @@
         request.onreadystatechange = () => {
           if (request.readyState === 4 && request.status === 200) {
             const result = JSON.parse(request.response);
+            result = result.data;
             if (result.image) {
-              img.src = "data:image/png;base64," + result.image;
+              img.src = +result.image;
             }
             if (result.segmented_image) {
-              segment.src = "data:image/png;base64," + result.segmented_image;
+              segment.src = result.segmented_image;
             }
             if (result.captions) {
               const captions = document.getElementById("captions");
