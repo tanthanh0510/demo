@@ -137,14 +137,13 @@
         request.onreadystatechange = () => {
           if (request.readyState === 4 && request.status === 200) {
             const result = JSON.parse(request.response);
-            result = result.data;
-            if (result.image) {
-              img.src = +result.image;
+            if (result.data.image) {
+              img.src = result.data.image;
             }
             if (result.segmented_image) {
-              segment.src = result.segmented_image;
+              segment.src = result.data.segmented_image;
             }
-            if (result.captions) {
+            if (result.data.captions) {
               const captions = document.getElementById("captions");
               const table = document.createElement("table");
               const thead = document.createElement("thead");
@@ -162,7 +161,7 @@
               thead.appendChild(tr);
               table.appendChild(thead);
               table.appendChild(tbody);
-              result.captions.forEach((caption) => {
+              result.data.captions.forEach((caption) => {
                 const tr = document.createElement("tr");
                 const td1 = document.createElement("td");
                 const td2 = document.createElement("td");
