@@ -41,11 +41,12 @@ def upload_file():
             # check if file is dicom, convert to png
             assert file.filename.endswith(".dcm") or file.filename.endswith(
                 ".png") or file.filename.endswith(".jpg") or file.filename.endswith(".jpeg"), "File must be in .dcm, .png, .jpg, .jpeg format"
-            
+            studyUID = None
             if file.filename.endswith(".dcm"):
                 # write file to uploads folder and convert to png
                 file.save(os.path.join("Uploads/Images", file.filename))
                 ds = pydicom.dcmread(os.path.join("Uploads/Images", file.filename))
+                studyUID = ds.get("StudyInstanceUID")
                 t = (ds.pixel_array - np.min(ds.pixel_array)) / \
                     (np.max(ds.pixel_array) - np.min(ds.pixel_array))            
                 imageName = os.path.join(
@@ -73,6 +74,7 @@ def upload_file():
                     "segmented_image": image_seg_url,
                 "captions":captions}
             output = {
+                "studyIUID": studyUID,
                 "code": 1,
                 "data": data,
             }

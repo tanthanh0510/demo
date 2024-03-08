@@ -1,1 +1,6 @@
 checkpoint
+*.dcm
+*.csv
+*.png
+*.ipynb
+.DS_Store

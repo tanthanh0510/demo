@@ -60,6 +60,8 @@ def generate_caption(image_paths):
         'p': str(p[i])
         }
         )
+    # sort captions by p value descending
+    captions = sorted(captions, key=lambda x: x['p'], reverse=True)
     return captions
 
 def segment(image_path):
