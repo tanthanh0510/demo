@@ -10,8 +10,10 @@ import cv2
 from model import generate_caption, segment
 from documents import default
 from utils import uploadFile
-
+import traceback
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 if not os.path.exists("Uploads"):
     os.makedirs("Uploads/Images")
@@ -82,7 +84,7 @@ def upload_file():
         else:
             return jsonify({"code": 0, "message": "Upload failed"})
     except Exception as e:
-        return jsonify({"code": 0, "message": str(e)})
+        return jsonify({"code": 0, "message": str(e), "traceback": traceback.format_exc()})
 
 
 @app.route('/update', methods=['POST'])
